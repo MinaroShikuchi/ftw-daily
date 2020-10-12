@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl';
 import { propTypes } from '../../util/types';
 import { isScrollingDisabled } from '../../ducks/UI.duck';
+import { resetPassword } from '../../ducks/user.duck';
 import {
   LayoutSideNavigation,
   LayoutWrapperMain,
@@ -28,6 +29,7 @@ export const PasswordChangePageComponent = props => {
     currentUser,
     onChange,
     onSubmitChangePassword,
+    onResetPassword,
     passwordChanged,
     scrollingDisabled,
     intl,
@@ -41,6 +43,7 @@ export const PasswordChangePageComponent = props => {
         currentUser={currentUser}
         onSubmit={onSubmitChangePassword}
         onChange={onChange}
+        onResetPassword={onResetPassword}
         inProgress={changePasswordInProgress}
         ready={passwordChanged}
       />
@@ -116,6 +119,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => ({
   onChange: () => dispatch(changePasswordClear()),
   onSubmitChangePassword: values => dispatch(changePassword(values)),
+  onResetPassword: values => dispatch(resetPassword(values)),
 });
 
 const PasswordChangePage = compose(

@@ -14,15 +14,30 @@ import { Form, PrimaryButton, FieldTextInput } from '../../components';
 import css from './PasswordChangeForm.css';
 
 const RESET_TIMEOUT = 800;
+const SHOW_EMAIL_SENT_TIMEOUT = 2000;
 
 class PasswordChangeFormComponent extends Component {
   constructor(props) {
     super(props);
+    this.state = { showResetPasswordMessage: false };
     this.resetTimeoutId = null;
     this.submittedValues = {};
+    this.handleResetPassword = this.handleResetPassword.bind(this);
   }
   componentWillUnmount() {
     window.clearTimeout(this.resetTimeoutId);
+  }
+
+  handleResetPassword() {
+    this.setState({ showResetPasswordMessage: true });
+    const email = this.props.currentUser.attributes.email;
+
+    this.props.onResetPassword(email).then(() => {
+      // show "verification email sent" text for a bit longer.
+      this.emailSentTimeoutId = window.setTimeout(() => {
+        this.setState({ showResetPasswordMessage: false });
+      }, SHOW_EMAIL_SENT_TIMEOUT);
+    });
   }
   render() {
     return (
@@ -126,6 +141,17 @@ class PasswordChangeFormComponent extends Component {
           const classes = classNames(rootClassName || css.root, className);
           const submitDisabled = invalid || pristineSinceLastSubmit || inProgress;
 
+          const resetPasswordLink = this.state.showResetPasswordMessage ? (
+            <FormattedMessage
+              id="PasswordChangeForm.resetPasswordLinkSent"
+              values={{ email: currentUser.attributes.email }}
+            />
+          ) : (
+            <span className={css.helperLink} onClick={this.handleResetPassword} role="button">
+              <FormattedMessage id="PasswordChangeForm.resetPasswordLinkText" />
+            </span>
+          );
+
           return (
             <Form
               className={classes}
@@ -162,6 +188,11 @@ class PasswordChangeFormComponent extends Component {
                 </h3>
                 <p className={css.confirmChangesInfo}>
                   <FormattedMessage id="PasswordChangeForm.confirmChangesInfo" />
+                  <br />
+                  <FormattedMessage
+                    id="PasswordChangeForm.resetPasswordInfo"
+                    values={{ resetPasswordLink }}
+                  />
                 </p>
 
                 <FieldTextInput
