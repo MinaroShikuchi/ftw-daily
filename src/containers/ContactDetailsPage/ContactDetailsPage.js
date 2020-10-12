@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl';
 import { propTypes } from '../../util/types';
 import { ensureCurrentUser } from '../../util/data';
-import { fetchCurrentUser, sendVerificationEmail } from '../../ducks/user.duck';
+import { fetchCurrentUser, sendVerificationEmail, resetPassword } from '../../ducks/user.duck';
 import {
   LayoutSideNavigation,
   LayoutWrapperMain,
@@ -36,6 +36,7 @@ export const ContactDetailsPageComponent = props => {
     sendVerificationEmailError,
     onResendVerificationEmail,
     onSubmitContactDetails,
+    onResetPassword,
     intl,
   } = props;
 
@@ -51,6 +52,7 @@ export const ContactDetailsPageComponent = props => {
       savePhoneNumberError={savePhoneNumberError}
       currentUser={currentUser}
       onResendVerificationEmail={onResendVerificationEmail}
+      onResetPassword={onResetPassword}
       onSubmit={values => onSubmitContactDetails({ ...values, currentEmail, currentPhoneNumber })}
       onChange={onChange}
       inProgress={saveContactDetailsInProgress}
@@ -141,6 +143,7 @@ const mapDispatchToProps = dispatch => ({
   onChange: () => dispatch(saveContactDetailsClear()),
   onResendVerificationEmail: () => dispatch(sendVerificationEmail()),
   onSubmitContactDetails: values => dispatch(saveContactDetails(values)),
+  onResetPassword: values => dispatch(resetPassword(values)),
 });
 
 const ContactDetailsPage = compose(
