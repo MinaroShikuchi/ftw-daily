@@ -39,6 +39,10 @@ export const SEND_VERIFICATION_EMAIL_REQUEST = 'app/user/SEND_VERIFICATION_EMAIL
 export const SEND_VERIFICATION_EMAIL_SUCCESS = 'app/user/SEND_VERIFICATION_EMAIL_SUCCESS';
 export const SEND_VERIFICATION_EMAIL_ERROR = 'app/user/SEND_VERIFICATION_EMAIL_ERROR';
 
+export const RESET_PASSWORD_REQUEST = 'app/PasswordResetPage/RESET_PASSWORD_REQUEST';
+export const RESET_PASSWORD_SUCCESS = 'app/PasswordResetPage/RESET_PASSWORD_SUCCESS';
+export const RESET_PASSWORD_ERROR = 'app/PasswordResetPage/RESET_PASSWORD_ERROR';
+
 // ================ Reducer ================ //
 
 const mergeCurrentUser = (oldCurrentUser, newCurrentUser) => {
@@ -66,6 +70,8 @@ const initialState = {
   currentUserHasOrdersError: null,
   sendVerificationEmailInProgress: false,
   sendVerificationEmailError: null,
+  resetPasswordInProgress: false,
+  resetPasswordError: null,
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -132,6 +138,14 @@ export default function reducer(state = initialState, action = {}) {
         sendVerificationEmailInProgress: false,
         sendVerificationEmailError: payload,
       };
+
+    case RESET_PASSWORD_REQUEST:
+      return { ...state, resetPasswordInProgress: true, resetPasswordError: null };
+    case RESET_PASSWORD_SUCCESS:
+      return { ...state, resetPasswordInProgress: false };
+    case RESET_PASSWORD_ERROR:
+      console.error(payload); // eslint-disable-line no-console
+      return { ...state, resetPasswordInProgress: false, resetPasswordError: payload };
 
     default:
       return state;
@@ -230,6 +244,15 @@ export const sendVerificationEmailError = e => ({
   payload: e,
 });
 
+export const resetPasswordRequest = () => ({ type: RESET_PASSWORD_REQUEST });
+
+export const resetPasswordSuccess = () => ({ type: RESET_PASSWORD_SUCCESS });
+
+export const resetPasswordError = e => ({
+  type: RESET_PASSWORD_ERROR,
+  error: true,
+  payload: e,
+});
 // ================ Thunks ================ //
 
 export const fetchCurrentUserHasListings = () => (dispatch, getState, sdk) => {
@@ -382,4 +405,12 @@ export const sendVerificationEmail = () => (dispatch, getState, sdk) => {
     .sendVerificationEmail()
     .then(() => dispatch(sendVerificationEmailSuccess()))
     .catch(e => dispatch(sendVerificationEmailError(storableError(e))));
+};
+
+export const resetPassword = email => (dispatch, getState, sdk) => {
+  dispatch(resetPasswordRequest());
+  return sdk.passwordReset
+    .request({ email })
+    .then(() => dispatch(resetPasswordSuccess()))
+    .catch(e => dispatch(resetPasswordError(storableError(e))));
 };
